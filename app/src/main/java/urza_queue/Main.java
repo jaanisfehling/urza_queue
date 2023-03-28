@@ -45,10 +45,10 @@ public class Main {
 
             // Add results line-by-line to Set
             while (rs.next()) {
-                String listViewURL = rs.getString("list_view_url");
+                String listViewUrl = rs.getString("list_view_url");
                 String articleSelector = rs.getString("article_selector");
-                String mostRecentArticleURL = rs.getString("most_recent_article_url");
-                CrawlTask task = new CrawlTask(listViewURL, articleSelector, mostRecentArticleURL);
+                String mostRecentArticleUrl = rs.getString("most_recent_article_url");
+                CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl);
                 result.add(task);
             }
         } catch (SQLException e) {

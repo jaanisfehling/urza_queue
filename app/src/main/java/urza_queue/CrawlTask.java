@@ -9,10 +9,10 @@ public class CrawlTask {
     public String mostRecentArticleUrl;
     private transient Instant lastCrawl;
 
-    public CrawlTask(String listViewURL, String articleSelector, String mostRecentArticleURL) {
-        this.listViewUrl = listViewURL;
+    public CrawlTask(String listViewUrl, String articleSelector, String mostRecentArticleUrl) {
+        this.listViewUrl = listViewUrl;
         this.articleSelector = articleSelector;
-        this.mostRecentArticleUrl = mostRecentArticleURL;
+        this.mostRecentArticleUrl = mostRecentArticleUrl;
         this.lastCrawl = Instant.now();
     }
 
