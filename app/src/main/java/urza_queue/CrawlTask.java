@@ -1,6 +1,7 @@
 package urza_queue;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class CrawlTask {
     public String listViewUrl;
@@ -15,6 +16,11 @@ public class CrawlTask {
         this.lastCrawl = Instant.now();
     }
 
+    public boolean isReady() {
+        float delayInSeconds = 5.0f;
+        return ChronoUnit.SECONDS.between(lastCrawl, Instant.now()) > delayInSeconds;
+    }
+
     @Override
     public String toString() {
         return listViewUrl;
@@ -22,7 +28,7 @@ public class CrawlTask {
 
     @Override
     public int hashCode() {
-        int result=5;
+        int result = 5;
         result = 31 * result + (listViewUrl != null ? listViewUrl.hashCode() : 0);
         result = 31 * result + (articleSelector != null ? articleSelector.hashCode() : 0);
         result = 31 * result + (mostRecentArticleUrl != null ? mostRecentArticleUrl.hashCode() : 0);

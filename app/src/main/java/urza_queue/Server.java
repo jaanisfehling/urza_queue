@@ -16,7 +16,7 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        System.out.println("new connection to " + conn.getRemoteSocketAddress());
+        System.out.println("New connection to " + conn.getRemoteSocketAddress());
     }
 
     @Override
@@ -26,12 +26,12 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        /* Is either a request from a scraper requesting a new batch of tasks
-        *  or a json containing an array of new scrape targets */
-
+        // Crawler waiting for a new Crawl Task
         if (message.contains("GET")) {
-             // Send new Batch of Tasks
+             Main.waitingScrapers.add(conn);
+             Main.on
         }
+        // New Crawl Target
         else {
             Gson gson = new Gson();
             CrawlTask[] newTargets = gson.fromJson(message, CrawlTask[].class);
@@ -41,11 +41,11 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
-        System.err.println("an error occurred on connection " + conn.getRemoteSocketAddress()  + ":" + ex);
+        System.err.println("An error occurred on connection " + conn.getRemoteSocketAddress()  + ": " + ex);
     }
 
     @Override
     public void onStart() {
-        System.out.println("server started successfully");
+        System.out.println("Server started successfully");
     }
 }
