@@ -3,16 +3,16 @@ package urza_queue;
 import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.sql.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
 
 public class Main {
+    public static LinkedHashSet<CrawlTask> crawlTasks;
 
     public static void main(String[] args) throws SQLException {
         System.out.println("Running on JVM version " + System.getProperty("java.version"));
 
-        Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/", "postgres", "mysecretpassword");
-        List<CrawlTask> crawlTasks = fetchCrawlTargets(conn);
+        Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:32768/", "postgres", "mysecretpassword");
+        crawlTasks = fetchCrawlTargets(conn);
 
         String host = "localhost";
         int port = 8887;
@@ -21,8 +21,9 @@ public class Main {
         server.run();
     }
 
-    public static List<CrawlTask> fetchCrawlTargets(Connection con) throws SQLException {
-        List<CrawlTask> result = new LinkedList<CrawlTask>();
+    public static LinkedHashSet<CrawlTask> fetchCrawlTargets(Connection con) throws SQLException {
+        LinkedHashSet<CrawlTask> result = new LinkedHashSet<>();
+
 
         String query = "SELECT * from \"target\"";
         try (Statement stmt = con.createStatement()) {

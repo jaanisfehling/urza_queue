@@ -1,11 +1,12 @@
 package urza_queue;
 
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
+import java.util.Arrays;
+
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-
+import com.google.gson.Gson;
 
 public class Server extends WebSocketServer {
 
@@ -25,7 +26,17 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        System.out.println("received message from "	+ conn.getRemoteSocketAddress() + ": " + message);
+        /* Is either a request from a scraper requesting a new batch of tasks
+        *  or a json containing an array of new scrape targets */
+
+        if (message.contains("GET")) {
+             // Send new Batch of Tasks
+        }
+        else {
+            Gson gson = new Gson();
+            CrawlTask[] newTargets = gson.fromJson(message, CrawlTask[].class);
+            Main.crawlTasks.addAll(Arrays.asList(newTargets));
+        }
     }
 
     @Override
