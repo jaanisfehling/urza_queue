@@ -1,8 +1,10 @@
 package urza_queue;
 
 import java.net.InetSocketAddress;
+import java.time.Instant;
 import java.util.Arrays;
 
+import org.checkerframework.checker.units.qual.C;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -26,17 +28,25 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        // Crawler waiting for a new Crawl Task
-        if (message.contains("GET")) {
-             Main.waitingScrapers.add(conn);
-             Main.on
+        System.out.println("New batch request");
+
+        // Crawler waiting for a new Crawl Task batch
+        final int BATCH_SIZE = 1;
+        CrawlTask[] batch = new CrawlTask[BATCH_SIZE];
+
+        // Fill up Array with new Crawl Tasks
+        for (int i=0; i<BATCH_SIZE; i++) {
+            try {
+                batch[i] = Main.crawlTasks.take();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-        // New Crawl Target
-        else {
-            Gson gson = new Gson();
-            CrawlTask[] newTargets = gson.fromJson(message, CrawlTask[].class);
-            Main.crawlTasks.addAll(Arrays.asList(newTargets));
-        }
+
+        // Send Crawl Tasks to Crawler
+        Gson gson = new Gson();
+        String response = gson.toJson(batch);
+        conn.send(response);
     }
 
     @Override

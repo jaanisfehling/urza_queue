@@ -7,7 +7,7 @@ public class CrawlTask {
     public String listViewUrl;
     public String articleSelector;
     public String mostRecentArticleUrl;
-    private transient Instant lastCrawl;
+    public transient Instant lastCrawl;
 
     public CrawlTask(String listViewUrl, String articleSelector, String mostRecentArticleUrl) {
         this.listViewUrl = listViewUrl;
@@ -17,8 +17,8 @@ public class CrawlTask {
     }
 
     public boolean isReady() {
-        float delayInSeconds = 5.0f;
-        return ChronoUnit.SECONDS.between(lastCrawl, Instant.now()) > delayInSeconds;
+        final float DELAY_IN_SECONDS = 5.0f;
+        return ChronoUnit.SECONDS.between(lastCrawl, Instant.now()) > DELAY_IN_SECONDS;
     }
 
     @Override

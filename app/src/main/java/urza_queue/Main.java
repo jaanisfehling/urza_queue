@@ -5,20 +5,20 @@ import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.sql.*;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
-    public static LinkedHashSet<CrawlTask> crawlTasks;
-    public static LinkedHashSet<WebSocket> waitingScrapers;
+    public static LinkedBlockingQueue<CrawlTask> crawlTasks;
 
     public static void main(String[] args) throws SQLException {
         System.out.println("Running on JVM version " + System.getProperty("java.version"));
 
-        // Setup Crawl Target List
+        // Setup Crawl Task Queue
         Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:32768/", "postgres", "mysecretpassword");
-        crawlTasks = fetchCrawlTargets(conn);
-
-        // Setup available Scraper List
-        waitingScrapers = new LinkedHashSet<WebSocket>();
+        crawlTasks = new LinkedBlockingQueue<>();
+        crawlTasks.addAll(fetchCrawlTargets(conn));
 
         // Expose Websocket
         String host = "localhost";
@@ -28,16 +28,8 @@ public class Main {
         server.run();
     }
 
-    public static void onAvailableCrawler() {
-        for (CrawlTask crawlTask : crawlTasks) {
-            if (crawlTask.isReady()) {
-
-            }
-        }
-    }
-
-    public static LinkedHashSet<CrawlTask> fetchCrawlTargets(Connection con) {
-        LinkedHashSet<CrawlTask> result = new LinkedHashSet<>();
+    public static List<CrawlTask> fetchCrawlTargets(Connection con) {
+        List<CrawlTask> result = new LinkedList<>();
 
         String query = "SELECT * from \"target\"";
         try (Statement stmt = con.createStatement()) {
