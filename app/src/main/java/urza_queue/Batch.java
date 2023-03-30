@@ -6,6 +6,8 @@ import org.java_websocket.WebSocket;
 
 public class Batch implements Runnable {
     final int BATCH_SIZE = 1;
+    final int WAIT_DELAY = 10_000;
+
     public WebSocket connectedCrawler;
 
     public Batch(WebSocket connectedCrawler) {
@@ -48,7 +50,7 @@ public class Batch implements Runnable {
                         }
                     }
                 },
-                5000
+                WAIT_DELAY
         );
     }
 }
