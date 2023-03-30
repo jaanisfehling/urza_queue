@@ -1,23 +1,20 @@
 package urza_queue;
 
-import org.java_websocket.WebSocket;
 import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.sql.*;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
-    public static LinkedBlockingQueue<CrawlTask> crawlTasks;
+    public final static LinkedBlockingQueue<CrawlTask> crawlTasks = new LinkedBlockingQueue<>();
 
     public static void main(String[] args) throws SQLException {
         System.out.println("Running on JVM version " + System.getProperty("java.version"));
 
         // Setup Crawl Task Queue
         Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:32768/", "postgres", "mysecretpassword");
-        crawlTasks = new LinkedBlockingQueue<>();
         crawlTasks.addAll(fetchCrawlTargets(conn));
 
         // Expose Websocket
