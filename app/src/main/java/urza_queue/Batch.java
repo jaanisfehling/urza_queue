@@ -36,21 +36,18 @@ public class Batch implements Runnable {
         connectedCrawler.send(response);
 
         // Requeue the Tasks after specified seconds
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < BATCH_SIZE; i++) {
-                            try {
-                                Main.crawlTasks.put(batch[i]);
-                            } catch (InterruptedException e) {
-                                System.out.println("Error when putting tasks in the queue: " + e.getMessage());
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }
-                },
-                WAIT_DELAY
-        );
+        try {
+            Thread.sleep(WAIT_DELAY);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        for (int i = 0; i < BATCH_SIZE; i++) {
+            try {
+                Main.crawlTasks.put(batch[i]);
+            } catch (InterruptedException e) {
+                System.out.println("Error when putting tasks in the queue: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
