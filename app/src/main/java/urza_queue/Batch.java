@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 
 import org.java_websocket.WebSocket;
 
+import static urza_queue.Main.updateCrawlTask;
+
 public class Batch implements Runnable {
     final int BATCH_SIZE = 1;
     final int WAIT_DELAY = 10_000;
@@ -24,7 +26,7 @@ public class Batch implements Runnable {
                 try {
                     batch[i] = Main.crawlTasks.take();
                 } catch (InterruptedException e) {
-                    System.out.println("Error when taking tasks from the queue: " + e.getMessage());
+//                    System.out.println("Error when taking tasks from the queue: " + e.getMessage());
                     throw new RuntimeException(e);
                 }
             }
@@ -43,9 +45,9 @@ public class Batch implements Runnable {
         }
         for (int i = 0; i < BATCH_SIZE; i++) {
             try {
-                Main.crawlTasks.put(batch[i]);
+                Main.crawlTasks.put(updateCrawlTask(batch[i]));
             } catch (InterruptedException e) {
-                System.out.println("Error when putting tasks in the queue: " + e.getMessage());
+//                System.out.println("Error when putting tasks in the queue: " + e.getMessage());
                 throw new RuntimeException(e);
             }
         }

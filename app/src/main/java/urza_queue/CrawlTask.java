@@ -7,13 +7,11 @@ public class CrawlTask {
     public String listViewUrl;
     public String articleSelector;
     public String mostRecentArticleUrl;
-    public transient Instant lastCrawl;
 
     public CrawlTask(String listViewUrl, String articleSelector, String mostRecentArticleUrl) {
         this.listViewUrl = listViewUrl;
         this.articleSelector = articleSelector;
         this.mostRecentArticleUrl = mostRecentArticleUrl;
-        this.lastCrawl = Instant.now();
     }
 
     @Override

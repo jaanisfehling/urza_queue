@@ -41,8 +41,8 @@ public class Main {
 
     public static List<CrawlTask> fetchCrawlTargets() {
         List<CrawlTask> result = new ArrayList<>();
-
         String query = "SELECT * from \"target\"";
+        
         try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
 
@@ -62,6 +62,7 @@ public class Main {
 
     public static void updateCrawlTargets() {
         String query = "SELECT * from \"target\"";
+
         try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
 
@@ -79,5 +80,24 @@ public class Main {
         } catch (SQLException | InterruptedException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static CrawlTask updateCrawlTask(CrawlTask task) {
+        String query = "SELECT * FROM \"target\" WHERE list_view_url=?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, task.listViewUrl);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String articleSelector = rs.getString("article_selector");
+                String mostRecentArticleUrl = rs.getString("most_recent_article_url");
+                task.articleSelector = articleSelector;
+                task.mostRecentArticleUrl = mostRecentArticleUrl;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return task;
     }
 }
