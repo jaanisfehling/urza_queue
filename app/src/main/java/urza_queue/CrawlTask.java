@@ -16,11 +16,6 @@ public class CrawlTask {
         this.lastCrawl = Instant.now();
     }
 
-    public boolean isReady() {
-        final float DELAY_IN_SECONDS = 5.0f;
-        return ChronoUnit.SECONDS.between(lastCrawl, Instant.now()) > DELAY_IN_SECONDS;
-    }
-
     @Override
     public String toString() {
         return listViewUrl;
@@ -30,8 +25,8 @@ public class CrawlTask {
     public int hashCode() {
         int result = 5;
         result = 31 * result + (listViewUrl != null ? listViewUrl.hashCode() : 0);
-        result = 31 * result + (articleSelector != null ? articleSelector.hashCode() : 0);
-        result = 31 * result + (mostRecentArticleUrl != null ? mostRecentArticleUrl.hashCode() : 0);
+//        result = 31 * result + (articleSelector != null ? articleSelector.hashCode() : 0);
+//        result = 31 * result + (mostRecentArticleUrl != null ? mostRecentArticleUrl.hashCode() : 0);
         return result;
     }
 
@@ -45,14 +40,14 @@ public class CrawlTask {
             if (!this.listViewUrl.equals(other.listViewUrl))
                 return false;
         }
-        if (this.articleSelector != null && other.articleSelector != null) {
-            if (!this.articleSelector.equals(other.articleSelector))
-                return false;
-        }
-        if (this.mostRecentArticleUrl != null && other.mostRecentArticleUrl != null) {
-            if (!this.mostRecentArticleUrl.equals(other.mostRecentArticleUrl))
-                return false;
-        }
+//        if (this.articleSelector != null && other.articleSelector != null) {
+//            if (!this.articleSelector.equals(other.articleSelector))
+//                return false;
+//        }
+//        if (this.mostRecentArticleUrl != null && other.mostRecentArticleUrl != null) {
+//            if (!this.mostRecentArticleUrl.equals(other.mostRecentArticleUrl))
+//                return false;
+//        }
         return true;
     }
 }
