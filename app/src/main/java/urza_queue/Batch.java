@@ -3,6 +3,7 @@ package urza_queue;
 import com.google.gson.Gson;
 
 import org.java_websocket.WebSocket;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 
 import static urza_queue.Main.updateCrawlTask;
 
@@ -26,7 +27,6 @@ public class Batch implements Runnable {
                 try {
                     batch[i] = Main.crawlTasks.take();
                 } catch (InterruptedException e) {
-//                    System.out.println("Error when taking tasks from the queue: " + e.getMessage());
                     throw new RuntimeException(e);
                 }
             }
@@ -35,7 +35,11 @@ public class Batch implements Runnable {
         // Send Crawl Tasks to Crawler
         Gson gson = new Gson();
         String response = gson.toJson(batch);
-        connectedCrawler.send(response);
+        try {
+            connectedCrawler.send(response);
+        } catch (WebsocketNotConnectedException e) {
+            System.out.println("Crawler disconnected: " + e.getMessage());
+        }
 
         // Requeue the Tasks after specified seconds
         try {
@@ -47,7 +51,6 @@ public class Batch implements Runnable {
             try {
                 Main.crawlTasks.put(updateCrawlTask(batch[i]));
             } catch (InterruptedException e) {
-//                System.out.println("Error when putting tasks in the queue: " + e.getMessage());
                 throw new RuntimeException(e);
             }
         }
