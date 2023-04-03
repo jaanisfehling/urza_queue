@@ -55,7 +55,7 @@ public class Main {
                 result.add(task);
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Cannot fetch Crawl Targets");
         }
         return result;
     }
@@ -78,7 +78,7 @@ public class Main {
                 }
             }
         } catch (SQLException | InterruptedException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Cannot update Crawl Targets");
         }
     }
 
@@ -96,7 +96,7 @@ public class Main {
                 task.mostRecentArticleUrl = mostRecentArticleUrl;
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Cannot update Crawl Target");
         }
         return task;
     }
