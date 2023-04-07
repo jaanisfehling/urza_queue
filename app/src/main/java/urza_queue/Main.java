@@ -29,7 +29,7 @@ public class Main {
         // Update the Database every Hour
         ScheduledExecutorService executorService;
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(Main::updateCrawlTargets, 30, 30, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(Main::updateCrawlTasks, 30, 30, TimeUnit.SECONDS);
 
         // Expose Websocket
         String host = "localhost";
@@ -39,28 +39,27 @@ public class Main {
         server.run();
     }
 
-    public static List<CrawlTask> fetchCrawlTargets() {
+    public static List<CrawlTask> fetchCrawlTargets() throws SQLException {
         List<CrawlTask> result = new ArrayList<>();
         String query = "SELECT * from \"target\"";
         
-        try (Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
 
-            // Add results line-by-line to Set
-            while (rs.next()) {
-                String listViewUrl = rs.getString("list_view_url");
-                String articleSelector = rs.getString("article_selector");
-                String mostRecentArticleUrl = rs.getString("most_recent_article_url");
-                CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl);
-                result.add(task);
-            }
-        } catch (SQLException e) {
-            System.out.println("Cannot fetch Crawl Targets");
+        // Add results line-by-line to Set
+        while (rs.next()) {
+            String listViewUrl = rs.getString("list_view_url");
+            String articleSelector = rs.getString("article_selector");
+            String mostRecentArticleUrl = rs.getString("most_recent_article_url");
+            String nextPageSelector = rs.getString("next_page_selector");
+            CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector);
+            result.add(task);
         }
+
         return result;
     }
 
-    public static void updateCrawlTargets() {
+    public static void updateCrawlTasks() {
         String query = "SELECT * from \"target\"";
 
         try (Statement stmt = conn.createStatement()) {
@@ -71,14 +70,15 @@ public class Main {
                 String listViewUrl = rs.getString("list_view_url");
                 String articleSelector = rs.getString("article_selector");
                 String mostRecentArticleUrl = rs.getString("most_recent_article_url");
-                CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl);
+                String nextPageSelector = rs.getString("next_page_selector");
+                CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector);
                 if (!enqueuedTasks.contains(task)) {
                     crawlTasks.put(task);
                     enqueuedTasks.add(task);
                 }
             }
         } catch (SQLException | InterruptedException e) {
-            System.out.println("Cannot update Crawl Targets");
+            System.out.println("Cannot update Crawl Tasks");
         }
     }
 
@@ -92,11 +92,13 @@ public class Main {
             if (rs.next()) {
                 String articleSelector = rs.getString("article_selector");
                 String mostRecentArticleUrl = rs.getString("most_recent_article_url");
+                String nextPageSelector = rs.getString("next_page_selector");
                 task.articleSelector = articleSelector;
                 task.mostRecentArticleUrl = mostRecentArticleUrl;
+                task.nextPageSelector = nextPageSelector;
             }
         } catch (SQLException e) {
-            System.out.println("Cannot update Crawl Target");
+            System.out.println("Cannot update Crawl Task");
         }
         return task;
     }

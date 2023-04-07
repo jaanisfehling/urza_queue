@@ -1,17 +1,16 @@
 package urza_queue;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
 public class CrawlTask {
     public String listViewUrl;
     public String articleSelector;
     public String mostRecentArticleUrl;
+    public String nextPageSelector;
 
-    public CrawlTask(String listViewUrl, String articleSelector, String mostRecentArticleUrl) {
+    public CrawlTask(String listViewUrl, String articleSelector, String mostRecentArticleUrl, String nextPageSelector) {
         this.listViewUrl = listViewUrl;
         this.articleSelector = articleSelector;
         this.mostRecentArticleUrl = mostRecentArticleUrl;
+        this.nextPageSelector = nextPageSelector;
     }
 
     @Override
@@ -23,8 +22,6 @@ public class CrawlTask {
     public int hashCode() {
         int result = 5;
         result = 31 * result + (listViewUrl != null ? listViewUrl.hashCode() : 0);
-//        result = 31 * result + (articleSelector != null ? articleSelector.hashCode() : 0);
-//        result = 31 * result + (mostRecentArticleUrl != null ? mostRecentArticleUrl.hashCode() : 0);
         return result;
     }
 
@@ -35,17 +32,8 @@ public class CrawlTask {
 
         final CrawlTask other = (CrawlTask) obj;
         if (this.listViewUrl != null && other.listViewUrl != null) {
-            if (!this.listViewUrl.equals(other.listViewUrl))
-                return false;
+            return this.listViewUrl.equals(other.listViewUrl);
         }
-//        if (this.articleSelector != null && other.articleSelector != null) {
-//            if (!this.articleSelector.equals(other.articleSelector))
-//                return false;
-//        }
-//        if (this.mostRecentArticleUrl != null && other.mostRecentArticleUrl != null) {
-//            if (!this.mostRecentArticleUrl.equals(other.mostRecentArticleUrl))
-//                return false;
-//        }
         return true;
     }
 }
