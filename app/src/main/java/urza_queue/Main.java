@@ -1,6 +1,9 @@
 package urza_queue;
 
 import org.java_websocket.server.WebSocketServer;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,14 +14,25 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class Main {
+    public static Logger logger = Logger.getLogger("Urza Queue");
     public static Connection conn;
     public final static LinkedBlockingQueue<CrawlTask> crawlTasks = new LinkedBlockingQueue<>();
     public final static Set<CrawlTask> enqueuedTasks = new HashSet<>();
 
     public static void main(String[] args) throws SQLException {
-        System.out.println("Running on JVM version " + System.getProperty("java.version"));
+        try {
+            LogManager.getLogManager().readConfiguration(new FileInputStream("logging.properties"));
+        } catch (SecurityException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        logger.log(Level.CONFIG, "Running on JVM version " + System.getProperty("java.version"));
+        logger.log(Level.CONFIG, "Number of Available Processors: " + Runtime.getRuntime().availableProcessors());
 
         // Setup Crawl Task Queue
         conn = DriverManager.getConnection("jdbc:postgresql://localhost:32768/", "postgres", "mysecretpassword");
@@ -34,7 +48,7 @@ public class Main {
         // Expose Websocket
         String host = "localhost";
         int port = 8887;
-        System.out.println("Starting Server at " + host + " and port " + port);
+        logger.log(Level.INFO, "Starting Server at " + host + " and port " + port);
         WebSocketServer server = new Server(new InetSocketAddress(host, port));
         server.run();
     }
@@ -60,6 +74,7 @@ public class Main {
     }
 
     public static void updateCrawlTasks() {
+        logger.log(Level.INFO, "Updating Crawl Tasks");
         String query = "SELECT * from \"target\"";
 
         try (Statement stmt = conn.createStatement()) {
@@ -73,12 +88,13 @@ public class Main {
                 String nextPageSelector = rs.getString("next_page_selector");
                 CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector);
                 if (!enqueuedTasks.contains(task)) {
+                    logger.log(Level.INFO, "New crawl task, adding to queue: " + task.toString());
                     crawlTasks.put(task);
                     enqueuedTasks.add(task);
                 }
             }
         } catch (SQLException | InterruptedException e) {
-            System.out.println("Cannot update Crawl Tasks");
+            logger.log(Level.SEVERE, "SQL Exception: Cannot update Crawl Tasks " + e.getMessage());
         }
     }
 
@@ -98,7 +114,7 @@ public class Main {
                 task.nextPageSelector = nextPageSelector;
             }
         } catch (SQLException e) {
-            System.out.println("Cannot update Crawl Task");
+            logger.log(Level.SEVERE, "SQL Exception: Cannot update Crawl Task: " + e.getMessage());
         }
         return task;
     }

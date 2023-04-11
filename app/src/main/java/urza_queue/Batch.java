@@ -5,7 +5,10 @@ import com.google.gson.Gson;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 
-import static urza_queue.Main.updateCrawlTask;
+import java.util.logging.Level;
+
+import static urza_queue.Main.*;
+
 
 public class Batch implements Runnable {
     final int BATCH_SIZE = 1;
@@ -26,6 +29,7 @@ public class Batch implements Runnable {
             for (int i = 0; i < BATCH_SIZE; i++) {
                 try {
                     batch[i] = Main.crawlTasks.take();
+                    logger.log(Level.FINE, "Taking task from queue: " + batch[i].toString());
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -35,10 +39,11 @@ public class Batch implements Runnable {
         // Send Crawl Tasks to Crawler
         Gson gson = new Gson();
         String response = gson.toJson(batch);
+        logger.log(Level.INFO, "Sending Batch to Crawler " + connectedCrawler.getRemoteSocketAddress());
         try {
             connectedCrawler.send(response);
         } catch (WebsocketNotConnectedException e) {
-            System.out.println("Crawler disconnected: " + e.getMessage());
+            logger.log(Level.SEVERE, "WebsocketNotConnectedException: Crawler disconnected: " + e.getMessage());
         }
 
         // Requeue the Tasks after specified seconds
@@ -50,6 +55,7 @@ public class Batch implements Runnable {
         for (int i = 0; i < BATCH_SIZE; i++) {
             try {
                 Main.crawlTasks.put(updateCrawlTask(batch[i]));
+                logger.log(Level.FINE, "Putting task into queue: " + batch[i].toString());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

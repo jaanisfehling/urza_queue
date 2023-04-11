@@ -1,9 +1,13 @@
 package urza_queue;
 
 import java.net.InetSocketAddress;
+import java.util.logging.Level;
+
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+
+import static urza_queue.Main.logger;
 
 public class Server extends WebSocketServer {
 
@@ -13,12 +17,12 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        System.out.println("New connection to " + conn.getRemoteSocketAddress());
+        logger.log(Level.INFO, "New connection to " + conn.getRemoteSocketAddress());
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        System.out.println("Closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
+        logger.log(Level.INFO, "Closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
     }
 
     @Override
@@ -29,12 +33,12 @@ public class Server extends WebSocketServer {
     }
 
     @Override
-    public void onError(WebSocket conn, Exception ex) {
-        System.err.println("An error occurred on connection " + conn.getRemoteSocketAddress()  + ": " + ex);
+    public void onError(WebSocket conn, Exception e) {
+        logger.log(Level.SEVERE, "Websocket Exception on " + conn.getRemoteSocketAddress()  + ": " + e);
     }
 
     @Override
     public void onStart() {
-        System.out.println("Server started successfully");
+        logger.log(Level.INFO, "Server started successfully");
     }
 }
