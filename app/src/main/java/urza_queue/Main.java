@@ -35,7 +35,7 @@ public class Main {
         logger.log(Level.CONFIG, "Number of Available Processors: " + Runtime.getRuntime().availableProcessors());
 
         // Setup Crawl Task Queue
-        conn = DriverManager.getConnection("jdbc:postgresql://localhost:32768/", "postgres", "mysecretpassword");
+        conn = DriverManager.getConnection("jdbc:postgresql://host.docker.internal:32768/", "postgres", "mysecretpassword");
         List<CrawlTask> targets = fetchCrawlTargets();
         crawlTasks.addAll(targets);
         enqueuedTasks.addAll(targets);
@@ -46,8 +46,8 @@ public class Main {
         executorService.scheduleAtFixedRate(Main::updateCrawlTasks, 30, 30, TimeUnit.SECONDS);
 
         // Expose Websocket
-        String host = "localhost";
-        int port = 8887;
+        String host = "172.17.0.1";
+        int port = 10000;
         logger.log(Level.INFO, "Starting Server at " + host + " and port " + port);
         WebSocketServer server = new Server(new InetSocketAddress(host, port));
         server.run();
