@@ -34,7 +34,7 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onError(WebSocket conn, Exception e) {
-        logger.log(Level.SEVERE, "Websocket Exception on " + conn.getRemoteSocketAddress()  + ": " + e);
+        logger.log(Level.SEVERE, "Websocket Exception on " + ((conn != null) ? conn.getRemoteSocketAddress() : "null") + ": " + e);
     }
 
     @Override
