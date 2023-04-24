@@ -11,7 +11,7 @@ import static urza_queue.Main.*;
 
 
 public class Batch implements Runnable {
-    final int BATCH_SIZE = 1;
+    final int BATCH_SIZE = 5;
     final int WAIT_DELAY = 10_000;
 
     public WebSocket connectedCrawler;
@@ -24,15 +24,13 @@ public class Batch implements Runnable {
         // Crawler waiting for a new Crawl Task batch
         CrawlTask[] batch = new CrawlTask[BATCH_SIZE];
 
-        synchronized (Main.crawlTasks) {
-            // Fill up Array with new Crawl Tasks
-            for (int i = 0; i < BATCH_SIZE; i++) {
-                try {
-                    batch[i] = Main.crawlTasks.take();
-                    logger.log(Level.FINE, "Taking task from queue: " + batch[i].toString());
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        // Fill up Array with new Crawl Tasks
+        for (int i = 0; i < BATCH_SIZE; i++) {
+            try {
+                batch[i] = Main.crawlTasks.take();
+                logger.log(Level.FINE, "Taking task from queue: " + batch[i].toString());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
 

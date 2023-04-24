@@ -3,10 +3,13 @@ package urza_queue;
 import java.net.InetSocketAddress;
 import java.util.logging.Level;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import static urza_queue.Main.enqueuedTasks;
 import static urza_queue.Main.logger;
 
 public class Server extends WebSocketServer {
@@ -27,6 +30,23 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
+        if (message != null && !message.isEmpty()) {
+            Gson gson = new Gson();
+            try {
+                CrawlTask[] tasks = gson.fromJson(message, CrawlTask[].class);
+                logger.log(Level.INFO, "Received updated Crawl Tasks");
+                for (CrawlTask task : tasks) {
+                    enqueuedTasks.set(enqueuedTasks.indexOf(task), task);
+                }
+            }
+            catch (JsonSyntaxException e) {
+                logger.log(Level.SEVERE, "JSON Syntax Exception when receiving updated Crawl Tasks from Crawler: " + e.getMessage());
+            }
+        }
+        else {
+            logger.log(Level.INFO, "New interest in tasks");
+        }
+
         Batch batch = new Batch(conn);
         Thread t = new Thread(batch);
         t.start();

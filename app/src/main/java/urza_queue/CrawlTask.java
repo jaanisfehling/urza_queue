@@ -5,12 +5,16 @@ public class CrawlTask {
     public String articleSelector;
     public String mostRecentArticleUrl;
     public String nextPageSelector;
+    public boolean oldArticlesScraped;
+    public int maxPageDepth;
 
-    public CrawlTask(String listViewUrl, String articleSelector, String mostRecentArticleUrl, String nextPageSelector) {
+    public CrawlTask(String listViewUrl, String articleSelector, String mostRecentArticleUrl, String nextPageSelector, boolean oldArticlesScraped, int maxPageDepth) {
         this.listViewUrl = listViewUrl;
         this.articleSelector = articleSelector;
         this.mostRecentArticleUrl = mostRecentArticleUrl;
         this.nextPageSelector = nextPageSelector;
+        this.oldArticlesScraped = oldArticlesScraped;
+        this.maxPageDepth = maxPageDepth;
     }
 
     @Override

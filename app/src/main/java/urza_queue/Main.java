@@ -6,10 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,7 +19,7 @@ public class Main {
     public static Logger logger = Logger.getLogger("Urza Queue");
     public static Connection conn;
     public final static LinkedBlockingQueue<CrawlTask> crawlTasks = new LinkedBlockingQueue<>();
-    public final static Set<CrawlTask> enqueuedTasks = new HashSet<>();
+    public final static List<CrawlTask> enqueuedTasks = new ArrayList<>();
 
     public static void main(String[] args) throws SQLException {
         try {
@@ -36,14 +33,12 @@ public class Main {
 
         // Setup Crawl Task Queue
         conn = DriverManager.getConnection("jdbc:postgresql://host.docker.internal:32768/", "postgres", "mysecretpassword");
-        List<CrawlTask> targets = fetchCrawlTargets();
-        crawlTasks.addAll(targets);
-        enqueuedTasks.addAll(targets);
+        queryCrawlTasks();
 
-        // Update the Database every Hour
+        // Update the Crawl Tasks every once in a while
         ScheduledExecutorService executorService;
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(Main::updateCrawlTasks, 30, 30, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(Main::queryCrawlTasks, 30, 30, TimeUnit.SECONDS);
 
         // Expose Websocket
         String host = "172.17.0.1";
@@ -53,69 +48,36 @@ public class Main {
         server.run();
     }
 
-    public static List<CrawlTask> fetchCrawlTargets() throws SQLException {
-        List<CrawlTask> result = new ArrayList<>();
-        String query = "SELECT * from \"target\"";
-        
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
-
-        // Add results line-by-line to Set
-        while (rs.next()) {
-            String listViewUrl = rs.getString("list_view_url");
-            String articleSelector = rs.getString("article_selector");
-            String mostRecentArticleUrl = rs.getString("most_recent_article_url");
-            String nextPageSelector = rs.getString("next_page_selector");
-            CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector);
-            result.add(task);
-        }
-
-        return result;
-    }
-
-    public static void updateCrawlTasks() {
-        logger.log(Level.INFO, "Updating Crawl Tasks");
-        String query = "SELECT * from \"target\"";
+    private static void queryCrawlTasks() {
+        logger.log(Level.INFO, "Querying the Database for Crawl Tasks");
+        String query = "SELECT * from target";
 
         try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
 
-            // Look for missing targets
             while (rs.next()) {
                 String listViewUrl = rs.getString("list_view_url");
                 String articleSelector = rs.getString("article_selector");
                 String mostRecentArticleUrl = rs.getString("most_recent_article_url");
                 String nextPageSelector = rs.getString("next_page_selector");
-                CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector);
+                boolean oldArticlesScraped = rs.getBoolean("old_articles_scraped");
+                int maxPageDepth = rs.getInt("max_page_depth");
+                CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector, oldArticlesScraped, maxPageDepth);
                 if (!enqueuedTasks.contains(task)) {
-                    logger.log(Level.INFO, "New crawl task, adding to queue: " + task.toString());
-                    crawlTasks.put(task);
                     enqueuedTasks.add(task);
+                    crawlTasks.put(task);
+                } else {
+                    enqueuedTasks.set(enqueuedTasks.indexOf(task), task);
                 }
             }
-        } catch (SQLException | InterruptedException e) {
-            logger.log(Level.SEVERE, "SQL Exception: Cannot update Crawl Tasks " + e.getMessage());
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "SQL Exception: Cannot query Crawl Tasks " + e.getMessage());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public static CrawlTask updateCrawlTask(CrawlTask task) {
-        String query = "SELECT * FROM \"target\" WHERE list_view_url=?";
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, task.listViewUrl);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String articleSelector = rs.getString("article_selector");
-                String mostRecentArticleUrl = rs.getString("most_recent_article_url");
-                String nextPageSelector = rs.getString("next_page_selector");
-                task.articleSelector = articleSelector;
-                task.mostRecentArticleUrl = mostRecentArticleUrl;
-                task.nextPageSelector = nextPageSelector;
-            }
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "SQL Exception: Cannot update Crawl Task: " + e.getMessage());
-        }
-        return task;
+        return enqueuedTasks.get(enqueuedTasks.indexOf(task));
     }
 }
