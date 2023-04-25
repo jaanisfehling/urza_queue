@@ -30,26 +30,26 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        if (message != null && !message.isEmpty()) {
+        if (message.equals("INTEREST")) {
+            logger.log(Level.INFO, "New interest in tasks");
+            Batch batch = new Batch(conn);
+            Thread t = new Thread(batch);
+            t.start();
+        }
+        else if (!message.isEmpty()) {
             Gson gson = new Gson();
             try {
-                CrawlTask[] tasks = gson.fromJson(message, CrawlTask[].class);
-                logger.log(Level.INFO, "Received updated Crawl Tasks");
-                for (CrawlTask task : tasks) {
-                    enqueuedTasks.set(enqueuedTasks.indexOf(task), task);
-                }
+                CrawlTask task = gson.fromJson(message, CrawlTask.class);
+                logger.log(Level.INFO, "Received updated Crawl Task");
+                enqueuedTasks.set(enqueuedTasks.indexOf(task), task);
             }
             catch (JsonSyntaxException e) {
-                logger.log(Level.SEVERE, "JSON Syntax Exception when receiving updated Crawl Tasks from Crawler: " + e.getMessage());
+                logger.log(Level.SEVERE, "JSON Syntax Exception when receiving updated Crawl Task from Crawler: " + e.getMessage());
             }
         }
         else {
-            logger.log(Level.INFO, "New interest in tasks");
+            logger.log(Level.INFO, "Received unknown message: " + message);
         }
-
-        Batch batch = new Batch(conn);
-        Thread t = new Thread(batch);
-        t.start();
     }
 
     @Override

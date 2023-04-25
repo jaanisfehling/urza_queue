@@ -41,7 +41,7 @@ public class Main {
         executorService.scheduleAtFixedRate(Main::queryCrawlTasks, 30, 30, TimeUnit.SECONDS);
 
         // Expose Websocket
-        String host = "172.17.0.1";
+        String host = "localhost";
         int port = 10000;
         logger.log(Level.INFO, "Starting Server at " + host + " and port " + port);
         WebSocketServer server = new Server(new InetSocketAddress(host, port));
@@ -64,6 +64,7 @@ public class Main {
                 int maxPageDepth = rs.getInt("max_page_depth");
                 CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector, oldArticlesScraped, maxPageDepth);
                 if (!enqueuedTasks.contains(task)) {
+                    logger.log(Level.FINE, "Putting Task " + task + "into Queue");
                     enqueuedTasks.add(task);
                     crawlTasks.put(task);
                 } else {
@@ -78,6 +79,7 @@ public class Main {
     }
 
     public static CrawlTask updateCrawlTask(CrawlTask task) {
+        logger.log(Level.FINE, "Updating Task " + task);
         return enqueuedTasks.get(enqueuedTasks.indexOf(task));
     }
 }

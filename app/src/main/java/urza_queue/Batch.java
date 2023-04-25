@@ -11,7 +11,7 @@ import static urza_queue.Main.*;
 
 
 public class Batch implements Runnable {
-    final int BATCH_SIZE = 5;
+    final int BATCH_SIZE = 1;
     final int WAIT_DELAY = 10_000;
 
     public WebSocket connectedCrawler;
