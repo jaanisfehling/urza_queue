@@ -55,10 +55,6 @@ public class Batch implements Runnable {
         }
         for (int i = 0; i < BATCH_SIZE; i++) {
             try {
-                System.out.println(enqueuedTasks);
-                System.out.println(batch[i]);
-                System.out.println(crawlTasks);
-
                 batch[i] = enqueuedTasks.get(enqueuedTasks.indexOf(batch[i]));
                 crawlTasks.put(batch[i]);
                 logger.log(Level.FINE, "Putting task into queue: " + batch[i].toString());
