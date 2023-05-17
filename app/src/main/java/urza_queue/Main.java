@@ -11,12 +11,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 public class Main {
-    public static Logger logger = Logger.getLogger("Urza Queue");
+    private static Logger logger = Logger.getLogger("");
     public static Connection conn;
     public final static LinkedBlockingQueue<CrawlTask> crawlTasks = new LinkedBlockingQueue<>();
     public final static List<CrawlTask> enqueuedTasks = new ArrayList<>();
@@ -76,10 +74,5 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static CrawlTask updateCrawlTask(CrawlTask task) {
-        logger.log(Level.FINE, "Updating Task " + task);
-        return enqueuedTasks.get(enqueuedTasks.indexOf(task));
     }
 }

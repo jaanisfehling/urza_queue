@@ -6,11 +6,14 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static urza_queue.Main.*;
 
 
 public class Batch implements Runnable {
+    Logger logger = Logger.getLogger("");
+
     final int BATCH_SIZE = 1;
     final int WAIT_DELAY = 10_000;
 
@@ -27,7 +30,7 @@ public class Batch implements Runnable {
         // Fill up Array with new Crawl Tasks
         for (int i = 0; i < BATCH_SIZE; i++) {
             try {
-                batch[i] = Main.crawlTasks.take();
+                batch[i] = crawlTasks.take();
                 logger.log(Level.FINE, "Taking task from queue: " + batch[i].toString());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -52,7 +55,12 @@ public class Batch implements Runnable {
         }
         for (int i = 0; i < BATCH_SIZE; i++) {
             try {
-                Main.crawlTasks.put(updateCrawlTask(batch[i]));
+                System.out.println(enqueuedTasks);
+                System.out.println(batch[i]);
+                System.out.println(crawlTasks);
+
+                batch[i] = enqueuedTasks.get(enqueuedTasks.indexOf(batch[i]));
+                crawlTasks.put(batch[i]);
                 logger.log(Level.FINE, "Putting task into queue: " + batch[i].toString());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

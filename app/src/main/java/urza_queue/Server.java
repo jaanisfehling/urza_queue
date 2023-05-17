@@ -2,6 +2,7 @@ package urza_queue;
 
 import java.net.InetSocketAddress;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -10,9 +11,9 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import static urza_queue.Main.enqueuedTasks;
-import static urza_queue.Main.logger;
 
 public class Server extends WebSocketServer {
+    Logger logger = Logger.getLogger("");
 
     public Server(InetSocketAddress address) {
         super(address);

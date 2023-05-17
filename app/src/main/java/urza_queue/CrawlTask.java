@@ -31,13 +31,13 @@ public class CrawlTask {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || obj == this || !getClass().equals(obj.getClass()))
+        if (obj == null || getClass() != obj.getClass())
             return false;
 
         final CrawlTask other = (CrawlTask) obj;
         if (this.listViewUrl != null && other.listViewUrl != null) {
             return this.listViewUrl.equals(other.listViewUrl);
         }
-        return true;
+        return false;
     }
 }
