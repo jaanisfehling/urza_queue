@@ -42,6 +42,7 @@ public class Server extends WebSocketServer {
             try {
                 CrawlTask task = gson.fromJson(message, CrawlTask.class);
                 logger.log(Level.INFO, "Received updated Crawl Task");
+                task.updateDB();
                 enqueuedTasks.set(enqueuedTasks.indexOf(task), task);
             }
             catch (JsonSyntaxException e) {
@@ -49,7 +50,7 @@ public class Server extends WebSocketServer {
             }
         }
         else {
-            logger.log(Level.INFO, "Received unknown message: " + message);
+            logger.log(Level.INFO, "Received empty message");
         }
     }
 

@@ -1,6 +1,17 @@
 package urza_queue;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static urza_queue.Main.conn;
+
 public class CrawlTask {
+    transient Logger logger = Logger.getLogger("");
+
     public String listViewUrl;
     public String articleSelector;
     public String mostRecentArticleUrl;
@@ -15,6 +26,18 @@ public class CrawlTask {
         this.nextPageSelector = nextPageSelector;
         this.oldArticlesScraped = oldArticlesScraped;
         this.maxPageDepth = maxPageDepth;
+    }
+
+    public void updateDB() {
+        String query = "UPDATE target SET most_recent_article_url=?, old_articles_scraped=? WHERE list_view_url=?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, mostRecentArticleUrl);
+            stmt.setBoolean(2, oldArticlesScraped);
+            stmt.setString(3, listViewUrl);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "SQL Exception: " + e.getMessage());
+        }
     }
 
     @Override
