@@ -1,17 +1,12 @@
 package urza_queue;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static urza_queue.Main.conn;
+import static urza_queue.Main.*;
 
 public class CrawlTask {
-    transient Logger logger = Logger.getLogger("");
-
     public String listViewUrl;
     public String articleSelector;
     public String mostRecentArticleUrl;

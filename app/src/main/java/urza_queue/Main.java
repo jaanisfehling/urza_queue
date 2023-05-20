@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
 public class Main {
-    private static Logger logger = Logger.getLogger("");
+    public static Logger logger = Logger.getLogger("");
     public static Connection conn;
     public final static LinkedBlockingQueue<CrawlTask> crawlTasks = new LinkedBlockingQueue<>();
     public final static List<CrawlTask> enqueuedTasks = new ArrayList<>();

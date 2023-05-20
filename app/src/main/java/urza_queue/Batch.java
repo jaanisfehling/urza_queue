@@ -6,14 +6,11 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static urza_queue.Main.*;
 
 
 public class Batch implements Runnable {
-    Logger logger = Logger.getLogger("");
-
     final int BATCH_SIZE = 1;
     final int WAIT_DELAY = 10_000;
 
