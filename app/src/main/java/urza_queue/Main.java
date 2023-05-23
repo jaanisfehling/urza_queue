@@ -30,7 +30,7 @@ public class Main {
         logger.log(Level.CONFIG, "Number of Available Processors: " + Runtime.getRuntime().availableProcessors());
 
         // Setup Crawl Task Queue
-        conn = DriverManager.getConnection("jdbc:postgresql://host.docker.internal:32768/", "postgres", "mysecretpassword");
+        conn = DriverManager.getConnection("jdbc:postgresql://localhost:32768/", "postgres", "mysecretpassword");
         queryCrawlTasks();
 
         // Update the Crawl Tasks every once in a while
