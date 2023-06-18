@@ -26,10 +26,13 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        logger.log(Level.CONFIG, "Running on JVM version " + System.getProperty("java.version"));
-        logger.log(Level.CONFIG, "Number of Available Processors: " + Runtime.getRuntime().availableProcessors());
+        logger.log(Level.INFO, "Running on JVM version " + System.getProperty("java.version"));
+        logger.log(Level.INFO, "Number of Available Processors: " + Runtime.getRuntime().availableProcessors());
 
-        // Setup Crawl Task Queue
+//        String dbUrl = System.getenv("DB_URL");
+//        String dbUser = System.getenv("DB_USER");
+//        String dbPassword = System.getenv("DB_PASSWORD");
+//        conn = DriverManager.getConnection("jdbc:postgresql://" + dbUrl, dbUser, dbPassword);
         conn = DriverManager.getConnection("jdbc:postgresql://localhost:32768/", "postgres", "mysecretpassword");
         queryCrawlTasks();
 
