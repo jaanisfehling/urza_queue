@@ -8,7 +8,7 @@ COPY --chown=gradle:gradle app/src /gradle-build/src
 RUN gradle build --no-daemon
 
 
-FROM amazoncorretto:19.0.2-alpine3.17
+FROM amazoncorretto:20-alpine3.18
 
 COPY --from=build-image /gradle-build/build/distributions/urza_queue.tar /app/
 
@@ -18,6 +18,6 @@ RUN tar -xvf urza_queue.tar
 WORKDIR /app/urza_queue
 COPY --from=build-image /gradle-build/logging.properties /app/urza_queue
 
-EXPOSE 10000
+EXPOSE 9000
 
 CMD bin/urza_queue
