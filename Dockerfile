@@ -18,6 +18,6 @@ RUN tar -xvf urza_queue.tar
 WORKDIR /app/urza_queue
 COPY --from=build-image /gradle-build/logging.properties /app/urza_queue
 
-EXPOSE 10000
+EXPOSE 9000
 
 CMD bin/urza_queue

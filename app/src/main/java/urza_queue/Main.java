@@ -43,7 +43,7 @@ public class Main {
 
         // Expose Websocket
         String host = "localhost";
-        int port = 10000;
+        int port = 9000;
         logger.log(Level.INFO, "Starting Server at " + host + " and port " + port);
         WebSocketServer server = new Server(new InetSocketAddress(host, port));
         server.run();
@@ -57,13 +57,14 @@ public class Main {
             ResultSet rs = stmt.executeQuery(query);
 
             while (rs.next()) {
+                String ticker = rs.getString("ticker");
                 String listViewUrl = rs.getString("list_view_url");
                 String articleSelector = rs.getString("article_selector");
                 String mostRecentArticleUrl = rs.getString("most_recent_article_url");
                 String nextPageSelector = rs.getString("next_page_selector");
                 boolean oldArticlesScraped = rs.getBoolean("old_articles_scraped");
                 int maxPageDepth = rs.getInt("max_page_depth");
-                CrawlTask task = new CrawlTask(listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector, oldArticlesScraped, maxPageDepth);
+                CrawlTask task = new CrawlTask(ticker, listViewUrl, articleSelector, mostRecentArticleUrl, nextPageSelector, oldArticlesScraped, maxPageDepth);
                 if (!enqueuedTasks.contains(task)) {
                     logger.log(Level.FINE, "Putting Task " + task + "into Queue");
                     enqueuedTasks.add(task);

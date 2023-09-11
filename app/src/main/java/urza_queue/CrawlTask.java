@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import static urza_queue.Main.*;
 
 public class CrawlTask {
+    public String ticker;
     public String listViewUrl;
     public String articleSelector;
     public String mostRecentArticleUrl;
@@ -14,7 +15,8 @@ public class CrawlTask {
     public boolean oldArticlesScraped;
     public int maxPageDepth;
 
-    public CrawlTask(String listViewUrl, String articleSelector, String mostRecentArticleUrl, String nextPageSelector, boolean oldArticlesScraped, int maxPageDepth) {
+    public CrawlTask(String ticker, String listViewUrl, String articleSelector, String mostRecentArticleUrl, String nextPageSelector, boolean oldArticlesScraped, int maxPageDepth) {
+        this.ticker = ticker;
         this.listViewUrl = listViewUrl;
         this.articleSelector = articleSelector;
         this.mostRecentArticleUrl = mostRecentArticleUrl;
