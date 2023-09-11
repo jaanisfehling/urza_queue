@@ -43,7 +43,7 @@ public class Main {
 
         // Expose Websocket
         String host = "localhost";
-        int port = 9000;
+        int port = 10000;
         logger.log(Level.INFO, "Starting Server at " + host + " and port " + port);
         WebSocketServer server = new Server(new InetSocketAddress(host, port));
         server.run();
